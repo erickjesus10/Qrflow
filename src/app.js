@@ -315,7 +315,7 @@ export function createApp() {
     <main class="container">
       <section class="card">
         <div class="badge">Projeto inicial</div>
-        <h1>ScanFlow</h1>
+        <h1>QRFlow</h1>
         <p class="subtitle">Transforme links em acesso rápido.</p>
 
         <label for="typeSelect" class="label">Tipo de QR Code</label>
@@ -363,7 +363,7 @@ export function createApp() {
         </section>
 
         <footer class="footer">
-          Criado por Erick Jean · ScanFlow v1.3
+          Criado por Erick Jean · Qrflow v1.4
         </footer>
       </section>
     </main>
