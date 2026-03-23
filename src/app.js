@@ -9,6 +9,8 @@ export function createApp() {
     const downloadBtn = document.getElementById("downloadBtn");
     const copyBtn = document.getElementById("copyBtn");
     const clearBtn = document.getElementById("clearBtn");
+    const openMobileBtn = document.getElementById("openMobileBtn");
+    const shareQrBtn = document.getElementById("shareQrBtn");
     const feedback = document.getElementById("feedback");
     const qrWrapper = document.getElementById("qrWrapper");
     const canvas = document.getElementById("qrCanvas");
@@ -34,51 +36,59 @@ export function createApp() {
       }
     }
 
+    function isMobile() {
+      return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
+    function canShareFiles() {
+      return typeof navigator !== "undefined" && typeof navigator.share === "function";
+    }
+
     function detectPlatform(rawValue, type) {
-  const value = rawValue.toLowerCase();
+      const value = rawValue.toLowerCase();
 
-  if (type === "whatsapp" || value.includes("wa.me") || value.includes("whatsapp")) {
-    return { name: "WhatsApp", icon: "WA", className: "platform-whatsapp" };
-  }
+      if (type === "whatsapp" || value.includes("wa.me") || value.includes("whatsapp")) {
+        return { name: "WhatsApp", icon: "WA", className: "platform-whatsapp" };
+      }
 
-  if (type === "text") {
-    return { name: "Texto", icon: "TXT", className: "platform-text" };
-  }
+      if (type === "text") {
+        return { name: "Texto", icon: "TXT", className: "platform-text" };
+      }
 
-  if (value.includes("linkedin.com")) {
-    return { name: "LinkedIn", icon: "in", className: "platform-linkedin" };
-  }
+      if (value.includes("linkedin.com")) {
+        return { name: "LinkedIn", icon: "in", className: "platform-linkedin" };
+      }
 
-  if (value.includes("instagram.com")) {
-    return { name: "Instagram", icon: "IG", className: "platform-instagram" };
-  }
+      if (value.includes("instagram.com")) {
+        return { name: "Instagram", icon: "IG", className: "platform-instagram" };
+      }
 
-  if (value.includes("youtube.com") || value.includes("youtu.be")) {
-    return { name: "YouTube", icon: "YT", className: "platform-youtube" };
-  }
+      if (value.includes("youtube.com") || value.includes("youtu.be")) {
+        return { name: "YouTube", icon: "YT", className: "platform-youtube" };
+      }
 
-  if (value.includes("github.com")) {
-    return { name: "GitHub", icon: "GH", className: "platform-github" };
-  }
+      if (value.includes("github.com")) {
+        return { name: "GitHub", icon: "GH", className: "platform-github" };
+      }
 
-  if (value.includes("discord.gg") || value.includes("discord.com")) {
-    return { name: "Discord", icon: "DI", className: "platform-discord" };
-  }
+      if (value.includes("discord.gg") || value.includes("discord.com")) {
+        return { name: "Discord", icon: "DI", className: "platform-discord" };
+      }
 
-  if (value.includes("facebook.com")) {
-    return { name: "Facebook", icon: "FB", className: "platform-facebook" };
-  }
+      if (value.includes("facebook.com")) {
+        return { name: "Facebook", icon: "FB", className: "platform-facebook" };
+      }
 
-  if (value.includes("tiktok.com")) {
-    return { name: "TikTok", icon: "TT", className: "platform-tiktok" };
-  }
+      if (value.includes("tiktok.com")) {
+        return { name: "TikTok", icon: "TT", className: "platform-tiktok" };
+      }
 
-  if (value.includes("x.com") || value.includes("twitter.com")) {
-    return { name: "X", icon: "X", className: "platform-x" };
-  }
+      if (value.includes("x.com") || value.includes("twitter.com")) {
+        return { name: "X", icon: "X", className: "platform-x" };
+      }
 
-  return { name: "Site", icon: "🌐", className: "platform-site" };
-}
+      return { name: "Site", icon: "🌐", className: "platform-site" };
+    }
 
     function buildValue() {
       const type = typeSelect.value;
@@ -123,23 +133,23 @@ export function createApp() {
     }
 
     function setQrTag(platform) {
-  qrTag.innerHTML = `
-    <span class="qr-tag-badge">${platform.icon}</span>
-    <span>${platform.name}</span>
-  `;
-  qrTag.className = `qr-tag ${platform.className}`;
-  qrTag.classList.remove("hidden");
-}
+      qrTag.innerHTML = `
+        <span class="qr-tag-badge">${platform.icon}</span>
+        <span>${platform.name}</span>
+      `;
+      qrTag.className = `qr-tag ${platform.className}`;
+      qrTag.classList.remove("hidden");
+    }
 
     function saveHistory(item) {
-      const current = JSON.parse(localStorage.getItem("scanflow_history") || "[]");
+      const current = JSON.parse(localStorage.getItem("qrflow_history") || "[]");
       const updated = [item, ...current].slice(0, 5);
-      localStorage.setItem("scanflow_history", JSON.stringify(updated));
+      localStorage.setItem("qrflow_history", JSON.stringify(updated));
       renderHistory();
     }
 
     function renderHistory() {
-      const current = JSON.parse(localStorage.getItem("scanflow_history") || "[]");
+      const current = JSON.parse(localStorage.getItem("qrflow_history") || "[]");
 
       if (!current.length) {
         historyList.innerHTML = `<li class="history-empty">Nenhum QR gerado ainda.</li>`;
@@ -150,8 +160,8 @@ export function createApp() {
         .map(
           (item) => `
             <li class="history-item">
-              <button 
-                class="history-button" 
+              <button
+                class="history-button"
                 data-value="${encodeURIComponent(item.value)}"
                 data-platform='${encodeURIComponent(JSON.stringify(item.platform))}'
               >
@@ -179,6 +189,7 @@ export function createApp() {
             });
 
             setQrTag(platform);
+
             qrWrapper.classList.remove("hidden");
             qrWrapper.classList.remove("qr-animate");
             void qrWrapper.offsetWidth;
@@ -187,6 +198,19 @@ export function createApp() {
             downloadBtn.classList.remove("hidden");
             copyBtn.classList.remove("hidden");
             clearBtn.classList.remove("hidden");
+
+            if (isMobile()) {
+              openMobileBtn.classList.remove("hidden");
+            } else {
+              openMobileBtn.classList.add("hidden");
+            }
+
+            if (canShareFiles()) {
+              shareQrBtn.classList.remove("hidden");
+            } else {
+              shareQrBtn.classList.add("hidden");
+            }
+
             showMessage("QR Code carregado do histórico.", "success");
           } catch (error) {
             console.error(error);
@@ -217,7 +241,7 @@ export function createApp() {
           width: size,
           margin: 2,
           color: {
-            dark: colorInput.value,
+            dark: "#000000",
             light: "#ffffff",
           },
         });
@@ -232,6 +256,18 @@ export function createApp() {
         downloadBtn.classList.remove("hidden");
         copyBtn.classList.remove("hidden");
         clearBtn.classList.remove("hidden");
+
+        if (isMobile()) {
+          openMobileBtn.classList.remove("hidden");
+        } else {
+          openMobileBtn.classList.add("hidden");
+        }
+
+        if (canShareFiles()) {
+          shareQrBtn.classList.remove("hidden");
+        } else {
+          shareQrBtn.classList.add("hidden");
+        }
 
         saveHistory({
           type,
@@ -254,7 +290,7 @@ export function createApp() {
       const image = canvas.toDataURL("image/png");
       const a = document.createElement("a");
       a.href = image;
-      a.download = "scanflow-qrcode.png";
+      a.download = "qrflow-qrcode.png";
       a.click();
     }
 
@@ -275,6 +311,60 @@ export function createApp() {
       }
     }
 
+    function openLinkOnMobile() {
+      const value = buildValue();
+
+      if (!value) {
+        showMessage("Não há link disponível para abrir.");
+        return;
+      }
+
+      window.open(value, "_blank", "noopener,noreferrer");
+    }
+
+    async function shareQrCode() {
+      try {
+        const value = buildValue();
+
+        if (!value) {
+          showMessage("Gere um QR Code antes de compartilhar.");
+          return;
+        }
+
+        const blob = await new Promise((resolve) => {
+          canvas.toBlob(resolve, "image/png");
+        });
+
+        if (!blob) {
+          showMessage("Não foi possível preparar o QR Code para compartilhamento.");
+          return;
+        }
+
+        const file = new File([blob], "qrflow-qrcode.png", { type: "image/png" });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: "QRFlow",
+            text: "Compartilhando QR Code gerado no QRFlow",
+            files: [file],
+          });
+        } else {
+          await navigator.share({
+            title: "QRFlow",
+            text: value,
+            url: value,
+          });
+        }
+
+        showMessage("Compartilhamento iniciado com sucesso.", "success");
+      } catch (error) {
+        if (error?.name !== "AbortError") {
+          console.error(error);
+          showMessage("Não foi possível compartilhar o QR Code.");
+        }
+      }
+    }
+
     function clearAll() {
       linkInput.value = "";
       clearMessage();
@@ -285,6 +375,9 @@ export function createApp() {
       downloadBtn.classList.add("hidden");
       copyBtn.classList.add("hidden");
       clearBtn.classList.add("hidden");
+      openMobileBtn.classList.add("hidden");
+      shareQrBtn.classList.add("hidden");
+
       const ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
@@ -305,6 +398,8 @@ export function createApp() {
     downloadBtn.addEventListener("click", downloadQRCode);
     copyBtn.addEventListener("click", copyLink);
     clearBtn.addEventListener("click", clearAll);
+    openMobileBtn.addEventListener("click", openLinkOnMobile);
+    shareQrBtn.addEventListener("click", shareQrCode);
     typeSelect.addEventListener("change", updatePlaceholder);
 
     linkInput.addEventListener("keydown", (event) => {
@@ -320,7 +415,7 @@ export function createApp() {
   return `
     <main class="container">
       <section class="card">
-        <div class="badge">Projeto inicial</div>
+        <div class="badge">Produto inicial</div>
         <h1>QRFlow</h1>
         <p class="subtitle">Transforme links em acesso rápido.</p>
 
@@ -350,6 +445,8 @@ export function createApp() {
           <button id="generateBtn" class="btn primary">Gerar QR Code</button>
           <button id="downloadBtn" class="btn secondary hidden">Baixar PNG</button>
           <button id="copyBtn" class="btn secondary hidden">Copiar conteúdo</button>
+          <button id="openMobileBtn" class="btn secondary hidden">Abrir link</button>
+          <button id="shareQrBtn" class="btn secondary hidden">Compartilhar QR</button>
           <button id="clearBtn" class="btn ghost hidden">Limpar</button>
         </div>
 
@@ -366,7 +463,7 @@ export function createApp() {
         </section>
 
         <footer class="footer">
-          Criado por Erick Jean · Qrflow v1.4
+          Criado por Erick Jean · QRFlow v1.5
         </footer>
       </section>
     </main>
