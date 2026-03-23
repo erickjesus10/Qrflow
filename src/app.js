@@ -5,7 +5,6 @@ export function createApp() {
     const typeSelect = document.getElementById("typeSelect");
     const linkInput = document.getElementById("linkInput");
     const sizeSelect = document.getElementById("sizeSelect");
-    const colorInput = document.getElementById("colorInput");
     const generateBtn = document.getElementById("generateBtn");
     const downloadBtn = document.getElementById("downloadBtn");
     const copyBtn = document.getElementById("copyBtn");
@@ -36,46 +35,50 @@ export function createApp() {
     }
 
     function detectPlatform(rawValue, type) {
-      const value = rawValue.toLowerCase();
+  const value = rawValue.toLowerCase();
 
-      if (type === "whatsapp" || value.includes("wa.me") || value.includes("whatsapp")) {
-        return { name: "WhatsApp", icon: "📱", className: "platform-whatsapp" };
-      }
+  if (type === "whatsapp" || value.includes("wa.me") || value.includes("whatsapp")) {
+    return { name: "WhatsApp", icon: "WA", className: "platform-whatsapp" };
+  }
 
-      if (type === "text") {
-        return { name: "Texto", icon: "📝", className: "platform-text" };
-      }
+  if (type === "text") {
+    return { name: "Texto", icon: "TXT", className: "platform-text" };
+  }
 
-      if (value.includes("linkedin.com")) {
-        return { name: "LinkedIn", icon: "💼", className: "platform-linkedin" };
-      }
+  if (value.includes("linkedin.com")) {
+    return { name: "LinkedIn", icon: "in", className: "platform-linkedin" };
+  }
 
-      if (value.includes("instagram.com")) {
-        return { name: "Instagram", icon: "📸", className: "platform-instagram" };
-      }
+  if (value.includes("instagram.com")) {
+    return { name: "Instagram", icon: "IG", className: "platform-instagram" };
+  }
 
-      if (value.includes("youtube.com") || value.includes("youtu.be")) {
-        return { name: "YouTube", icon: "▶️", className: "platform-youtube" };
-      }
+  if (value.includes("youtube.com") || value.includes("youtu.be")) {
+    return { name: "YouTube", icon: "YT", className: "platform-youtube" };
+  }
 
-      if (value.includes("github.com")) {
-        return { name: "GitHub", icon: "🐙", className: "platform-github" };
-      }
+  if (value.includes("github.com")) {
+    return { name: "GitHub", icon: "GH", className: "platform-github" };
+  }
 
-      if (value.includes("facebook.com")) {
-        return { name: "Facebook", icon: "📘", className: "platform-facebook" };
-      }
+  if (value.includes("discord.gg") || value.includes("discord.com")) {
+    return { name: "Discord", icon: "DI", className: "platform-discord" };
+  }
 
-      if (value.includes("tiktok.com")) {
-        return { name: "TikTok", icon: "🎵", className: "platform-tiktok" };
-      }
+  if (value.includes("facebook.com")) {
+    return { name: "Facebook", icon: "FB", className: "platform-facebook" };
+  }
 
-      if (value.includes("x.com") || value.includes("twitter.com")) {
-        return { name: "X / Twitter", icon: "🐦", className: "platform-x" };
-      }
+  if (value.includes("tiktok.com")) {
+    return { name: "TikTok", icon: "TT", className: "platform-tiktok" };
+  }
 
-      return { name: "Site", icon: "🔗", className: "platform-site" };
-    }
+  if (value.includes("x.com") || value.includes("twitter.com")) {
+    return { name: "X", icon: "X", className: "platform-x" };
+  }
+
+  return { name: "Site", icon: "🌐", className: "platform-site" };
+}
 
     function buildValue() {
       const type = typeSelect.value;
@@ -120,10 +123,13 @@ export function createApp() {
     }
 
     function setQrTag(platform) {
-      qrTag.innerHTML = `<span class="qr-tag-icon">${platform.icon}</span><span>${platform.name}</span>`;
-      qrTag.className = `qr-tag ${platform.className}`;
-      qrTag.classList.remove("hidden");
-    }
+  qrTag.innerHTML = `
+    <span class="qr-tag-badge">${platform.icon}</span>
+    <span>${platform.name}</span>
+  `;
+  qrTag.className = `qr-tag ${platform.className}`;
+  qrTag.classList.remove("hidden");
+}
 
     function saveHistory(item) {
       const current = JSON.parse(localStorage.getItem("scanflow_history") || "[]");
@@ -167,7 +173,7 @@ export function createApp() {
               width: Number(sizeSelect.value),
               margin: 2,
               color: {
-                dark: colorInput.value,
+                dark: "#000000",
                 light: "#ffffff",
               },
             });
@@ -339,9 +345,6 @@ export function createApp() {
           <option value="280" selected>Médio</option>
           <option value="360">Grande</option>
         </select>
-
-        <label for="colorInput" class="label">Cor do QR Code</label>
-        <input id="colorInput" class="input color-input" type="color" value="#000000" />
 
         <div class="actions">
           <button id="generateBtn" class="btn primary">Gerar QR Code</button>
